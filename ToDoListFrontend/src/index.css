@@ -1,0 +1,16 @@
+@media only screen and (max-width: 576px) {
+  ul {
+    margin-left: 20px;
+    flex: 0 0 auto;
+    width: auto;
+  }
+  div.row div{
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .btn-folder {
+    padding: 0.25 rem 0.5 rem!important;
+    font-size: 12px!important;
+    border-radius: 0.2 rem;
+  }
+}
