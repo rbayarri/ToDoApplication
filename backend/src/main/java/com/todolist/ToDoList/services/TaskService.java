@@ -13,81 +13,106 @@ import static com.todolist.ToDoList.validations.Validations.validateString;
 
 @Service
 public class TaskService {
-  
+
   @Autowired
   private TaskRepository taskRepository;
-  
+
   @Autowired
   private FolderService folderService;
-  
+
   @Transactional
-  public Task createTask(String description, Integer idFolder) throws ErrorService{
-    
+  public Task createTask(String description, Integer idFolder) throws ErrorService {
     validateString(description);
     Folder folder = folderService.findById(idFolder);
     Task task = new Task();
     task.setDescription(description);
     task.setFolder(folder);
     return taskRepository.save(task);
-  
   }
-  
+
   @Transactional
-  public Task updateDescription(Integer id, String description) throws ErrorService{
+  public Task createTask(Task task) throws ErrorService {
+    validateString(task.getDescription());
+    folderService.findById(task.getFolder().getId());
+    return taskRepository.save(task);
+  }
+
+  @Transactional
+  public Task updateDescription(Integer id, String description) throws ErrorService {
     validateString(description);
     Optional<Task> response = taskRepository.findById(id);
-    if(response.isPresent()){
+    if (response.isPresent()) {
       Task task = response.get();
       task.setDescription(description);
       return taskRepository.save(task);
     }
     throw new ErrorService("The task id was not found");
   }
-  
+
   @Transactional
-  public Task updateFinished(Integer id, Boolean finished) throws ErrorService{
+  public Task updateFinished(Integer id, Boolean finished) throws ErrorService {
     Optional<Task> response = taskRepository.findById(id);
-    if(response.isPresent()){
+    if (response.isPresent()) {
       Task task = response.get();
       task.setFinished(finished);
       return taskRepository.save(task);
     }
     throw new ErrorService("The task id was not found");
   }
-  
+
   @Transactional
-  public void removeTask(Integer id) throws ErrorService{
+  public Task updateTask(Task task) throws ErrorService {
+    validateString(task.getDescription());
+    folderService.findById(task.getFolder().getId());
+    Optional<Task> response = taskRepository.findById(task.getId());
+    if (response.isPresent()) {
+      return taskRepository.save(task);
+    }
+    throw new ErrorService("Task id was not found");
+  }
+
+  @Transactional
+  public void removeTask(Integer id) throws ErrorService {
     Optional<Task> response = taskRepository.findById(id);
-    if(response.isPresent()){
+    if (response.isPresent()) {
       Task task = response.get();
       taskRepository.delete(task);
-    }else{
-      throw new ErrorService("The task id was not found");
+    } else {
+      throw new ErrorService("Task id was not found");
     }
   }
   
   @Transactional
-  public void removeAllByFolder(Integer id) throws ErrorService{
+  public void removeTask(Task task) throws ErrorService {
+    Optional<Task> response = taskRepository.findById(task.getId());
+    if(response.isPresent()){
+      taskRepository.delete(task);
+      return;
+    }
+    throw new ErrorService("Task id was not found");
+  }
+
+  @Transactional
+  public void removeAllByFolder(Integer id) throws ErrorService {
     folderService.findById(id);
     taskRepository.removeAllByFolder(id);
   }
-  
+
   @Transactional(readOnly = true)
-  public List<Task> listTasks(){
+  public List<Task> listTasks() {
     return taskRepository.findAll();
   }
-  
+
   @Transactional(readOnly = true)
-  public List<Task> listTasksByFolder(Integer idFolder) throws ErrorService{
+  public List<Task> listTasksByFolder(Integer idFolder) throws ErrorService {
     folderService.findById(idFolder);
     return taskRepository.listTasksByFolder(idFolder);
-    
   }
-  
+
   @Transactional(readOnly = true)
-  public Task findById(Integer id) throws ErrorService{
+  public Task findById(Integer id) throws ErrorService {
     Optional<Task> response = taskRepository.findById(id);
-    if(response.isPresent()){
+    if (response.isPresent()) {
       return response.get();
     }
     throw new ErrorService("The task id was not found");

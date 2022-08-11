@@ -33,7 +33,17 @@ public class FolderService {
       folder.setName(name);
       return folderRepository.save(folder);
     }
-    throw new ErrorService("The folder id was not found");
+    throw new ErrorService("Folder id was not found");
+  }
+
+  @Transactional
+  public Folder updateFolder(Folder folder) throws ErrorService {
+    validateString(folder.getName());
+    Optional<Folder> response = folderRepository.findById(folder.getId());
+    if (response.isPresent()){
+      return folderRepository.save(folder);
+    }
+    throw new ErrorService("Folder id was not found");
   }
 
   @Transactional
@@ -43,21 +53,31 @@ public class FolderService {
       Folder folder = response.get();
       folderRepository.delete(folder);
     } else {
-      throw new ErrorService("The folder id was not found");
+      throw new ErrorService("Folder id was not found");
     }
   }
   
-  @Transactional(readOnly = true)
-  public Folder findById(Integer id) throws ErrorService{
-    Optional<Folder> response = folderRepository.findById(id);
+  @Transactional
+  public void removeFolder(Folder folder) throws ErrorService {
+    Optional<Folder> response = folderRepository.findById(folder.getId());
     if(response.isPresent()){
+      folderRepository.delete(folder);
+      return;
+    }
+    throw new ErrorService("Folder id was not found");
+  }
+
+  @Transactional(readOnly = true)
+  public Folder findById(Integer id) throws ErrorService {
+    Optional<Folder> response = folderRepository.findById(id);
+    if (response.isPresent()) {
       return response.get();
     }
     throw new ErrorService("The folder id was not found");
   }
-  
+
   @Transactional(readOnly = true)
-  public List<Folder> listFolders(){
+  public List<Folder> listFolders() {
     return folderRepository.findAll();
   }
 
